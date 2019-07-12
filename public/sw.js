@@ -10,7 +10,12 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', function(event) {
   event.respondWith( async function () {
       try {
-        return await fetch(event.request)
+        const networkResponse =  await fetch(event.request)
+        const cache = await caches.open('airbnb-dynamic');
+        event.waitUntil(
+          cache.put(event.request, networkResponse.clone())
+        );
+        return networkResponse;
       } catch (err) {
         return caches.match(event.request)
       }
